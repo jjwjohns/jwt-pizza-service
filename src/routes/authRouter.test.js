@@ -10,14 +10,6 @@ beforeAll(async () => {
   testUserAuthToken = registerRes.body.token;
 });
 
-// {
-//   method: 'POST',
-//   path: '/api/auth',
-//   description: 'Register a new user',
-//   example: `curl -X POST localhost:3000/api/auth -d '{"name":"pizza diner", "email":"d@jwt.com", "password":"diner"}' -H 'Content-Type: application/json'`,
-//   response: { user: { id: 2, name: 'pizza diner', email: 'd@jwt.com', roles: [{ role: 'diner' }] }, token: 'tttttt' },
-// },
-
 
 test('register', async () => {
   const user = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
