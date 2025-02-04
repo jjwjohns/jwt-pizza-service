@@ -17,13 +17,21 @@ beforeAll(async () => {
     authToken = loginRes.body.token;
 });
 
+afterAll(async () => {
+    const connection = await DB.getConnection();
+    await DB.query(connection, 'DELETE FROM store WHERE name LIKE ?', ['test%']);
+    await DB.query(connection, 'DELETE FROM franchise WHERE name LIKE ?', ['test%']);
+    await DB.query(connection, 'DELETE FROM user WHERE email = LIKE ?', ['%admin.com']);
+    await DB.close();
+});
+
 test('get franchises', async () => {
     const getRes = await request(app).get('/api/franchise');
     expect(getRes.status).toBe(200);
 });
 
 test('add franchise', async () => {
-    const franName = randomName();
+    const franName = 'test' + randomName();
     const franchiseReq = { name: franName, admins: [{ email: admin.email }] };
     const addFranchiseRes = await request(app).post(`/api/franchise`).set('Authorization', `Bearer ${authToken}`).send(franchiseReq);
     expect(addFranchiseRes.status).toBe(200);
@@ -38,22 +46,22 @@ test('getUserFranchises', async () => {
 });
 
 test('create franchise store', async () => {
-    const franName = randomName();
+    const franName = 'test' + randomName();
     const franchiseReq = { name: franName, admins: [{ email: admin.email }] };
     const addFranchiseRes = await request(app).post(`/api/franchise`).set('Authorization', `Bearer ${authToken}`).send(franchiseReq);
     expect(addFranchiseRes.status).toBe(200);
     expect(addFranchiseRes.headers['content-type']).toMatch('application/json; charset=utf-8');
     expect(addFranchiseRes.body.name).toBe(franName);
 
-    const storeReq = { franchiseId: addFranchiseRes.body.id, name: 'NEW YORK' };
+    const storeReq = { franchiseId: addFranchiseRes.body.id, name: 'test NEW YORK' };
     const addStoreRes = await request(app).post(`/api/franchise/${addFranchiseRes.body.id}/store`).set('Authorization', `Bearer ${authToken}`).send(storeReq);
     expect(addStoreRes.status).toBe(200);
     expect(addStoreRes.headers['content-type']).toMatch('application/json; charset=utf-8');
-    expect(addStoreRes.body.name).toBe('NEW YORK');
+    expect(addStoreRes.body.name).toBe('test NEW YORK');
 });
 
 test('delete franchise', async () => {
-    const franName = randomName();
+    const franName = 'test' + randomName();
     const franchiseReq = { name: franName, admins: [{ email: admin.email }] };
     const addFranchiseRes = await request(app).post(`/api/franchise`).set('Authorization', `Bearer ${authToken}`).send(franchiseReq);
     expect(addFranchiseRes.status).toBe(200);
@@ -70,18 +78,18 @@ test('delete franchise', async () => {
 });
 
 test('delete franchise store', async () => {
-    const franName = randomName();
+    const franName = 'test' + randomName();
     const franchiseReq = { name: franName, admins: [{ email: admin.email }] };
     const addFranchiseRes = await request(app).post(`/api/franchise`).set('Authorization', `Bearer ${authToken}`).send(franchiseReq);
     expect(addFranchiseRes.status).toBe(200);
     expect(addFranchiseRes.headers['content-type']).toMatch('application/json; charset=utf-8');
     expect(addFranchiseRes.body.name).toBe(franName);
 
-    const storeReq = { franchiseId: addFranchiseRes.body.id, name: 'NEW YORK' };
+    const storeReq = { franchiseId: addFranchiseRes.body.id, name: 'test NEW YORK' };
     const addStoreRes = await request(app).post(`/api/franchise/${addFranchiseRes.body.id}/store`).set('Authorization', `Bearer ${authToken}`).send(storeReq);
     expect(addStoreRes.status).toBe(200);
     expect(addStoreRes.headers['content-type']).toMatch('application/json; charset=utf-8');
-    expect(addStoreRes.body.name).toBe('NEW YORK');
+    expect(addStoreRes.body.name).toBe('test NEW YORK');
 
     const deleteStoreRes = await request(app).delete(`/api/franchise/${addFranchiseRes.body.id}/store/${addStoreRes.body.id}`).set('Authorization', `Bearer ${authToken}`);
     expect(deleteStoreRes.status).toBe(200);
@@ -89,10 +97,8 @@ test('delete franchise store', async () => {
     expect(deleteStoreRes.body.message).toBe('store deleted');
 
     const getFranchisesRes = await request(app).get(`/api/franchise/${admin.id}`).set('Authorization', `Bearer ${authToken}`);
-    expect(getFranchisesRes.body).not.toContainEqual(expect.objectContaining({ name: 'NEW YORK' }));
+    expect(getFranchisesRes.body).not.toContainEqual(expect.objectContaining({ name: 'test NEW YORK' }));
 });
-
-
 
 async function createAdminUser() {
     let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };

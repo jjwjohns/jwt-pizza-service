@@ -1,6 +1,5 @@
 const request = require('supertest');
 const app = require('../service');
-// const { Role, DB } = require('../database/database.js');
 
 if (process.env.VSCODE_INSPECTOR_OPTIONS) {
   jest.setTimeout(60 * 1000 * 5); // 5 minutes
@@ -16,7 +15,6 @@ beforeAll(async () => {
   expectValidJwt(testUserAuthToken);
 });
 
-
 test('register', async () => {
   const user = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
   user.email = Math.random().toString(36).substring(2, 12) + '@test.com';
@@ -31,7 +29,6 @@ test('register-no-password', async () => {
   expect(regRes.status).toBe(400);
 });
 
-
 test('login', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);
@@ -42,21 +39,33 @@ test('login', async () => {
   expect(loginRes.body.user).toMatchObject(expectedUser);
 });
 
+test('logout', async () => {
+  const logoutRes = await request(app).delete('/api/auth').set('Authorization', `Bearer ${testUserAuthToken}`);
+  expect(logoutRes.status).toBe(200);
+  expect(logoutRes.body).toMatchObject({ message: 'logout successful' });
+});
+
+test('logout-no-token', async () => {
+  const logoutRes = await request(app).delete('/api/auth');
+  expect(logoutRes.status).toBe(401);
+});
+
+
+  test('update', async () => {
+    const newTestUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
+    newTestUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
+    const registerRes = await request(app).post('/api/auth').send(testUser);
+    const newTestUserAuthToken = registerRes.body.token;
+    const newTestUserId = registerRes.body.user.id;
+    expectValidJwt(newTestUserAuthToken);
+  
+    
+  
+    const updateRes = await request(app).put(`/api/auth/${newTestUserId}`).set('Authorization', `Bearer ${newTestUserAuthToken}`).send(newTestUser);
+    expect(updateRes.status).toBe(200);
+    expect(updateRes.body.email).toBe(newTestUser.email);
+    });
+
 function expectValidJwt(potentialJwt) {
   expect(potentialJwt).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
 }
-
-
-
-// function randomName() {
-//   return Math.random().toString(36).substring(2, 12);
-// }
-
-// async function createAdminUser() {
-//   let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
-//   user.name = randomName();
-//   user.email = user.name + '@admin.com';
-
-//   user = await DB.addUser(user);
-//   return { ...user, password: 'toomanysecrets' };
-// }
