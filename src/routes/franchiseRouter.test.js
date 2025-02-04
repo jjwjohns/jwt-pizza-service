@@ -17,13 +17,12 @@ beforeAll(async () => {
     authToken = loginRes.body.token;
 });
 
-afterAll(async () => {
-    const connection = await DB.getConnection();
-    await DB.query(connection, 'DELETE FROM store WHERE name LIKE ?', ['test%']);
-    await DB.query(connection, 'DELETE FROM franchise WHERE name LIKE ?', ['test%']);
-    await DB.query(connection, 'DELETE FROM user WHERE email = LIKE ?', ['%admin.com']);
-    await DB.close();
-});
+// afterAll(async () => {
+//     const connection = await DB.getConnection();
+//     await DB.query(connection, 'DELETE FROM store WHERE name LIKE ?', ['test%']);
+//     await DB.query(connection, 'DELETE FROM franchise WHERE name LIKE ?', ['test%']);
+//     await DB.query(connection, 'DELETE FROM user WHERE email = LIKE ?', ['%admin.com']);
+// });
 
 test('get franchises', async () => {
     const getRes = await request(app).get('/api/franchise');
