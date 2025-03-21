@@ -60,6 +60,15 @@ while true; do
 done &
 pid4=$!
 
+# Simulate a diner ordering a pizza not authorized every 20 seconds
+while true; do
+  curl -s -X POST $host/api/order -H 'Content-Type: application/json' -d '{"franchiseId": 1, "storeId":1, "items":[{ "menuId": 1, "description": "Veggie", "price": 0.05 }]}'  -H "Authorization: Bearer $token" > /dev/null
+  echo "Tried to buy a pizza..."
+  sleep 20
+
+done &
+pid5=$!
+
 
 # Wait for the background processes to complete
-wait $pid1 $pid2 $pid3 $pid4
+wait $pid1 $pid2 $pid3 $pid4 $pid5

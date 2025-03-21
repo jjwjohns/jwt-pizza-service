@@ -19,17 +19,17 @@ function requestTracker(req, res, next) {
     next();
 }
 
-// let successes = 0;
-// let failures = 0;
+let successes = 0;
+let failures = 0;
 
-// function authTracker(success) {
-//     if (success) {
-//         successes++;
-//     }
-//     else {
-//         failures++;
-//     }
-// }
+function authTracker(success) {
+    if (success) {
+        successes++;
+    }
+    else {
+        failures++;
+    }
+}
 
 
 function getCpuUsagePercentage() {
@@ -63,6 +63,10 @@ setInterval(() => {
 
     sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
     sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
+    sendMetricToGrafana('auth_successes', successes, 'sum', 'count');
+    sendMetricToGrafana('auth_failures', failures, 'sum', 'count');
+    successes = 0;
+    failures = 0;
 }, 10000);
 
 setInterval(() => {
@@ -203,4 +207,4 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       });
   }
   
-  module.exports = { requestTracker };
+  module.exports = { requestTracker, authTracker };
