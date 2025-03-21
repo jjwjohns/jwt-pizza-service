@@ -17,6 +17,19 @@ function requestTracker(req, res, next) {
     next();
 }
 
+let successes = 0;
+let failures = 0;
+
+function authTracker(success) {
+    if (success) {
+        successes++;
+    }
+    else {
+        failures++;
+    }
+}
+
+
 function getCpuUsagePercentage() {
   const cpuUsage = (os.loadavg()[0] / os.cpus().length) * 100;
 //   console.log(`CPU: ${cpuUsage.toFixed(2)}`);
@@ -186,4 +199,4 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       });
   }
   
-  module.exports = { requestTracker };
+  module.exports = { requestTracker, authTracker };
