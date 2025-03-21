@@ -70,4 +70,4 @@ pid5=$!
 
 
 # Wait for the background processes to complete
-wait $pid1 $pid2 $pid3 $pid4, $pid5
+wait $pid1 $pid2 $pid3 $pid4 $pid5
