@@ -27,13 +27,13 @@ function getMemoryUsagePercentage() {
 setInterval(() => {
   Object.keys(requests).forEach((endpoint) => {
     console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
-    sendMetricToGrafana('requests', requests[endpoint], 'sum', '1');
+    sendHTTPMetricToGrafana('requests', requests[endpoint], { endpoint });
   });
 
-  // Reset request counts after sending metrics
-  Object.keys(requests).forEach((endpoint) => {
-    requests[endpoint] = 0;
-  });
+//   // Reset request counts after sending metrics
+//   Object.keys(requests).forEach((endpoint) => {
+//     requests[endpoint] = 0;
+//   });
 
   sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
   sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
@@ -73,6 +73,12 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                       {
                         asInt: metricValue,
                         timeUnixNano: Date.now() * 1000000,
+                        attributes: [
+                            {
+                                key: "source",
+                                value: { stringValue: config.metrics.source }
+                            }
+                        ]
                       },
                     ],
                   },
@@ -100,6 +106,62 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
           response.text().then((text) => {
             console.error(`Failed to push metrics data to Grafana: ${text}\n${body}`);
           });
+        } else {
+          console.log(`Pushed ${metricName}`);
+        }
+      })
+      .catch((error) => {
+        console.error('Error pushing metrics:', error);
+      });
+  }
+
+
+  function sendHTTPMetricToGrafana(metricName, metricValue, attributes) {
+    attributes = { ...attributes, source: config.metrics.source };
+  
+    const metric = {
+      resourceMetrics: [
+        {
+          scopeMetrics: [
+            {
+              metrics: [
+                {
+                  name: metricName,
+                  unit: '1',
+                  sum: {
+                    dataPoints: [
+                      {
+                        asInt: metricValue,
+                        timeUnixNano: Date.now() * 1000000,
+                        attributes: [],
+                      },
+                    ],
+                    aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+                    isMonotonic: true,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+  
+    Object.keys(attributes).forEach((key) => {
+      metric.resourceMetrics[0].scopeMetrics[0].metrics[0].sum.dataPoints[0].attributes.push({
+        key: key,
+        value: { stringValue: attributes[key] },
+      });
+    });
+  
+    fetch(`${config.metrics.url}`, {
+      method: 'POST',
+      body: JSON.stringify(metric),
+      headers: { Authorization: `Bearer ${config.metrics.apiKey}`, 'Content-Type': 'application/json' },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Failed to push metrics data to Grafana');
         } else {
           console.log(`Pushed ${metricName}`);
         }

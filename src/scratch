@@ -40,23 +40,23 @@ setInterval(() => {
 }, 10000);
 
 
-// function sendMetricsPeriodically(period) {
-//     const timer = setInterval(() => {
-//       try {
-//         const buf = new MetricBuilder();
-//         httpMetrics(buf);
-//         systemMetrics(buf);
-//         userMetrics(buf);
-//         purchaseMetrics(buf);
-//         authMetrics(buf);
+function sendMetricsPeriodically(period) {
+    const timer = setInterval(() => {
+      try {
+        const buf = new MetricBuilder();
+        httpMetrics(buf);
+        systemMetrics(buf);
+        userMetrics(buf);
+        purchaseMetrics(buf);
+        authMetrics(buf);
   
-//         const metrics = buf.toString('\n');
-//         this.sendMetricToGrafana(metrics);
-//       } catch (error) {
-//         console.log('Error sending metrics', error);
-//       }
-//     }, period);
-//   }
+        const metrics = buf.toString('\n');
+        this.sendMetricToGrafana(metrics);
+      } catch (error) {
+        console.log('Error sending metrics', error);
+      }
+    }, period);
+  }
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
     const metric = {
@@ -71,9 +71,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                   [type]: {
                     dataPoints: [
                       {
-                        value: type === 'sum'
-                          ? (Number.isInteger(metricValue) ? { asInt: metricValue } : { doubleValue: metricValue })
-                          : { stringValue: String(metricValue) },  // Ensure non-sum values are strings
+                        asInt: metricValue,
                         timeUnixNano: Date.now() * 1000000,
                       },
                     ],
