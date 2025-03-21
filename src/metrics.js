@@ -2,10 +2,12 @@ const config = require('./config');
 const os = require('os');
 
 const requests = {};
+const activeUsers = new Set();
 
 function requestTracker(req, res, next) {
     const endpoint = req.path;
     const method = req.method;
+    activeUsers.add(req.user);
 
     if (!requests[endpoint]) {
         requests[endpoint] = {};
@@ -17,7 +19,7 @@ function requestTracker(req, res, next) {
 
 function getCpuUsagePercentage() {
   const cpuUsage = (os.loadavg()[0] / os.cpus().length) * 100;
-  console.log(`CPU: ${cpuUsage.toFixed(2)}`);
+//   console.log(`CPU: ${cpuUsage.toFixed(2)}`);
   return Math.round(cpuUsage);
 }
 
@@ -40,13 +42,15 @@ setInterval(() => {
         });
       });
 
-  // Reset request counts after sending metrics
-  Object.keys(requests).forEach((endpoint) => {
-    requests[endpoint] = 0;
-  });
+    Object.keys(requests).forEach((endpoint) => {
+        requests[endpoint] = 0;
+    });
 
-  sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
-  sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
+    sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
+    sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
+    sendMetricToGrafana('active_users', activeUsers.size, 'gauge', 'count');
+
+    activeUsers.clear();
 }, 10000);
 
 
