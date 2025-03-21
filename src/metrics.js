@@ -7,7 +7,9 @@ const activeUsers = new Set();
 function requestTracker(req, res, next) {
     const endpoint = req.path;
     const method = req.method;
-    activeUsers.add(req.user);
+    if (req.user) {
+        activeUsers.add(req.user);
+    }
 
     if (!requests[endpoint]) {
         requests[endpoint] = {};
@@ -61,10 +63,12 @@ setInterval(() => {
 
     sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
     sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
-    sendMetricToGrafana('active_users', activeUsers.size, 'gauge', 'count');
-
-    activeUsers.clear();
 }, 10000);
+
+setInterval(() => {
+    sendMetricToGrafana('active_users', activeUsers.size, 'gauge', 'count')
+    activeUsers.clear();
+}, 30000);
 
 
 // function sendMetricsPeriodically(period) {
