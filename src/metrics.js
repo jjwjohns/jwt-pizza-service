@@ -6,7 +6,7 @@ const requests = {};
 function requestTracker(req, res, next) {
     const endpoint = req.path;
     requests[endpoint] = (requests[endpoint] || 0) + 1;
-    console.log(`Tracked: ${endpoint}, Count: ${requests[endpoint]}`);
+    // console.log(`Tracked: ${endpoint}, Count: ${requests[endpoint]}`);
     next();
 }
 
@@ -46,7 +46,7 @@ function requestTracker(req, res, next) {
 // This will periodically send metrics to Grafana
 setInterval(() => {
   Object.keys(requests).forEach((endpoint) => {
-    console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
+    // console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
     sendMetricToGrafana('requests', requests[endpoint], { endpoint });
   });
 }, 10000);
