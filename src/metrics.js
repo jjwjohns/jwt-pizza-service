@@ -101,25 +101,6 @@ setInterval(() => {
     activeUsers.clear();
 }, 30000);
 
-
-// function sendMetricsPeriodically(period) {
-//     const timer = setInterval(() => {
-//       try {
-//         const buf = new MetricBuilder();
-//         httpMetrics(buf);
-//         systemMetrics(buf);
-//         userMetrics(buf);
-//         purchaseMetrics(buf);
-//         authMetrics(buf);
-  
-//         const metrics = buf.toString('\n');
-//         this.sendMetricToGrafana(metrics);
-//       } catch (error) {
-//         console.log('Error sending metrics', error);
-//       }
-//     }, period);
-//   }
-
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
     const metric = {
       
