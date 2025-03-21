@@ -3,6 +3,7 @@ const config = require('../config.js');
 const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
+// const metrics = require('../metrics.js');
 
 const orderRouter = express.Router();
 
@@ -86,8 +87,10 @@ orderRouter.post(
     });
     const j = await r.json();
     if (r.ok) {
+      // metrics.pizzaTracker(orderReq.  , 0, 0);
       res.send({ order, reportSlowPizzaToFactoryUrl: j.reportUrl, jwt: j.jwt });
     } else {
+      // metrics.pizzaTracker(0, 1, 0);
       res.status(500).send({ message: 'Failed to fulfill order at factory', reportPizzaCreationErrorToPizzaFactoryUrl: j.reportUrl });
     }
   })

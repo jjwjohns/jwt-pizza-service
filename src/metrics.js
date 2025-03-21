@@ -4,19 +4,36 @@ const os = require('os');
 const requests = {};
 const activeUsers = new Set();
 
+let sold = 0;
+let failure = 0;
+let revenue = 0;
+
 function requestTracker(req, res, next) {
-    const endpoint = req.path;
-    const method = req.method;
-    if (req.user) {
-        activeUsers.add(req.user);
-    }
+  const endpoint = req.path;
+  const method = req.method;
+  if (req.user) {
+      activeUsers.add(req.user);
+  }
 
-    if (!requests[endpoint]) {
-        requests[endpoint] = {};
-    }
+  if (!requests[endpoint]) {
+      requests[endpoint] = {};
+  }
 
-    requests[endpoint][method] = (requests[endpoint][method] || 0) + 1;
-    next();
+  requests[endpoint][method] = (requests[endpoint][method] || 0) + 1;
+
+  if (req.path === '/api/order' && req.method === 'POST') {
+    res.on('finish', () => {
+      if (res.statusCode === 200) {
+          req.body.items.forEach(item => {
+              sold++;
+              revenue += item.price;
+          });
+      } else {
+          failure++;
+      }
+    });
+  }
+  next();
 }
 
 let successes = 0;
@@ -30,7 +47,6 @@ function authTracker(success) {
         failures++;
     }
 }
-
 
 function getCpuUsagePercentage() {
   const cpuUsage = (os.loadavg()[0] / os.cpus().length) * 100;
@@ -67,6 +83,12 @@ setInterval(() => {
     sendMetricToGrafana('auth_failures', failures, 'sum', 'count');
     successes = 0;
     failures = 0;
+    sendMetricToGrafana('pizzas_sold', sold, 'sum', 'count');
+    sendMetricToGrafana('orders_failed', failure, 'sum', 'count');
+    sendMetricToGrafana('revenue', revenue, 'sum', 'usd');
+    sold = 0;
+    failure = 0;
+    revenue = 0;
 }, 10000);
 
 setInterval(() => {
