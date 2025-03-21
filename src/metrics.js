@@ -7,8 +7,17 @@ const activeUsers = new Set();
 let sold = 0;
 let failure = 0;
 let revenue = 0;
+let latencies = [];
+let Orderlatencies = [];
 
 function requestTracker(req, res, next) {
+  const start = process.hrtime();
+  res.on("finish", () => {
+    const diff = process.hrtime(start);
+    const latencyMs = (diff[0] * 1e3) + (diff[1] / 1e6);
+    latencies.push(latencyMs);
+  });
+
   const endpoint = req.path;
   const method = req.method;
   if (req.user) {
@@ -22,7 +31,12 @@ function requestTracker(req, res, next) {
   requests[endpoint][method] = (requests[endpoint][method] || 0) + 1;
 
   if (req.path === '/api/order' && req.method === 'POST') {
+    const startOrder = process.hrtime();
     res.on('finish', () => {
+      const Orderdiff = process.hrtime(startOrder);
+      const OrderlatencyMs = (Orderdiff[0] * 1e3) + (Orderdiff[1] / 1e6);
+      Orderlatencies.push(OrderlatencyMs);
+
       if (res.statusCode === 200) {
           req.body.items.forEach(item => {
               sold++;
@@ -86,14 +100,19 @@ setInterval(() => {
     successes = 0;
     failures = 0;
     sendMetricToGrafana('pizzas_sold', sold, 'sum', 'count');
-    console.log('sold:', sold);
     sendMetricToGrafana('orders_failed', failure, 'sum', 'count');
-    console.log('failure:', failure);
     sendMetricToGrafana('revenue', revenue, 'sum', 'BTC');
-    console.log('revenue:', revenue);
     sold = 0;
     failure = 0;
     revenue = 0;
+    if (latencies.length > 0) {
+      sendMetricToGrafana('latency', latencies.reduce((sum, num) => sum + num, 0) / latencies.length, 'gauge', 'ms');
+      latencies = [];
+    }
+    if (Orderlatencies.length > 0){
+      sendMetricToGrafana('order_latency', Orderlatencies.reduce((sum, num) => sum + num, 0) / Orderlatencies.length, 'gauge', 'ms');
+      Orderlatencies = [];
+    }
 }, 10000);
 
 setInterval(() => {
@@ -115,7 +134,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                   [type]: {
                     dataPoints: [
                       {
-                        ...(unit === "BTC" ? { asDouble: metricValue } : { asInt: metricValue }),
+                        ...(unit === "BTC" || unit === "ms" ? { asDouble: metricValue } : { asInt: metricValue }),
                         timeUnixNano: Date.now() * 1000000,
                         attributes: [
                             {

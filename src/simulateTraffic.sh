@@ -11,7 +11,7 @@ host=$1
 # Function to cleanly exit
 cleanup() {
   echo "Terminating background processes..."
-  kill $pid1 $pid2 $pid3 $pid4
+  kill $pid1 $pid2 $pid3 $pid4 $pid5
   exit 0
 }
 
