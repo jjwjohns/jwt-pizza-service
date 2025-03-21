@@ -6,8 +6,9 @@ const requests = {};
 function requestTracker(req, res, next) {
     const endpoint = req.path;
     requests[endpoint] = (requests[endpoint] || 0) + 1;
+    console.log(`Tracked: ${endpoint}, Count: ${requests[endpoint]}`);
     next();
-  }
+}
 
 // function getCpuUsagePercentage() {
 //   const cpuUsage = os.loadavg()[0] / os.cpus().length;
@@ -45,12 +46,13 @@ function requestTracker(req, res, next) {
 // This will periodically send metrics to Grafana
 setInterval(() => {
   Object.keys(requests).forEach((endpoint) => {
+    console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
     sendMetricToGrafana('requests', requests[endpoint], { endpoint });
   });
 }, 10000);
 
 function sendMetricToGrafana(metricName, metricValue, attributes) {
-  attributes = { ...attributes, source: config.source };
+  attributes = { ...attributes, source: config.metrics.source };
 
   const metric = {
     resourceMetrics: [
@@ -87,10 +89,10 @@ function sendMetricToGrafana(metricName, metricValue, attributes) {
     });
   });
 
-  fetch(`${config.url}`, {
+  fetch(`${config.metrics.url}`, {
     method: 'POST',
     body: JSON.stringify(metric),
-    headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${config.metrics.apiKey}`, 'Content-Type': 'application/json' },
   })
     .then((response) => {
       if (!response.ok) {
