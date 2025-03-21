@@ -11,9 +11,9 @@ function requestTracker(req, res, next) {
 }
 
 function getCpuUsagePercentage() {
-  const cpuUsage = os.loadavg()[0] / os.cpus().length;
-  console.log(`CPU: ${cpuUsage}`);
-  return cpuUsage.toFixed(2) * 100;
+  const cpuUsage = (os.loadavg()[0] / os.cpus().length) * 100;
+  console.log(`CPU: ${cpuUsage.toFixed(2)}`);
+  return parseFloat(cpuUsage.toFixed(2));
 }
 
 function getMemoryUsagePercentage() {
@@ -21,38 +21,23 @@ function getMemoryUsagePercentage() {
   const freeMemory = os.freemem();
   const usedMemory = totalMemory - freeMemory;
   const memoryUsage = (usedMemory / totalMemory) * 100;
-  console.log(`Memory: ${memoryUsage}`);
-  return memoryUsage.toFixed(2);
+  console.log(`Memory: ${memoryUsage.toFixed(2)}`);
+  return parseFloat(memoryUsage.toFixed(2));
 }
 
-
-// function sendMetricsPeriodically(period) {
-//     const timer = setInterval(() => {
-//       try {
-//         const buf = new MetricBuilder();
-//         httpMetrics(buf);
-//         systemMetrics(buf);
-//         userMetrics(buf);
-//         purchaseMetrics(buf);
-//         authMetrics(buf);
-  
-//         const metrics = buf.toString('\n');
-//         this.sendMetricToGrafana(metrics);
-//       } catch (error) {
-//         console.log('Error sending metrics', error);
-//       }
-//     }, period);
-//   }
-
-
-// This will periodically send metrics to Grafana
 setInterval(() => {
   Object.keys(requests).forEach((endpoint) => {
     console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
-    sendMetricToGrafana('requests', requests[endpoint], 'sum' , '1');
-    sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
-    sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
+    sendMetricToGrafana('requests', requests[endpoint], 'sum', '1');
   });
+
+  // Reset request counts after sending metrics
+  Object.keys(requests).forEach((endpoint) => {
+    requests[endpoint] = 0;
+  });
+
+  sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
+  sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
 }, 10000);
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
@@ -82,32 +67,33 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
         },
       ],
     };
-  
+
     if (type === 'sum') {
       metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].aggregationTemporality = 'AGGREGATION_TEMPORALITY_CUMULATIVE';
       metric.resourceMetrics[0].scopeMetrics[0].metrics[0][type].isMonotonic = true;
     }
-  
+
     const body = JSON.stringify(metric);
-    console.log("Sending metric to Grafana:", JSON.stringify(metric, null, 2)); // Log before sending
+    
+    console.log(`Sending metric to Grafana: ${metricName}, Value: ${metricValue}`);
 
     fetch(`${config.metrics.url}`, {
-      method: 'POST',
-      body: body,
-      headers: { Authorization: `Bearer ${config.metrics.apiKey}`, 'Content-Type': 'application/json' },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          response.text().then((text) => {
-            console.error(`Failed to push metrics data to Grafana: ${text}\n${body}`);
-          });
-        } else {
-          console.log(`Pushed ${metricName}`);
-        }
+        method: 'POST',
+        body: body,
+        headers: { Authorization: `Bearer ${config.metrics.apiKey}`, 'Content-Type': 'application/json' },
       })
-      .catch((error) => {
-        console.error('Error pushing metrics:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            response.text().then((text) => {
+              console.error(`Failed to push metrics data to Grafana: ${text}\n${body}`);
+            });
+          } else {
+            console.log(`Pushed ${metricName}`);
+          }
+        })
+        .catch((error) => {
+          console.error('Error pushing metrics:', error);
+        });
   }
-
-module.exports = { requestTracker };
+  
+  module.exports = { requestTracker };
