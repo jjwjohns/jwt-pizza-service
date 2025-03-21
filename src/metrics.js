@@ -5,8 +5,13 @@ const requests = {};
 
 function requestTracker(req, res, next) {
     const endpoint = req.path;
-    requests[endpoint] = (requests[endpoint] || 0) + 1;
-    console.log(`Tracked: ${endpoint}, Count: ${requests[endpoint]}`);
+    const method = req.method;
+
+    if (!requests[endpoint]) {
+        requests[endpoint] = {};
+    }
+
+    requests[endpoint][method] = (requests[endpoint][method] || 0) + 1;
     next();
 }
 
@@ -25,15 +30,20 @@ function getMemoryUsagePercentage() {
 }
 
 setInterval(() => {
-  Object.keys(requests).forEach((endpoint) => {
-    console.log(`Sending ${requests[endpoint]} requests for ${endpoint}`);
-    sendHTTPMetricToGrafana('requests', requests[endpoint], { endpoint });
-  });
+    Object.keys(requests).forEach((endpoint) => {
+        Object.keys(requests[endpoint]).forEach((method) => {
+    
+          sendHTTPMetricToGrafana('http_requests', requests[endpoint][method], {
+            method: method, 
+            endpoint: endpoint 
+          });
+        });
+      });
 
-//   // Reset request counts after sending metrics
-//   Object.keys(requests).forEach((endpoint) => {
-//     requests[endpoint] = 0;
-//   });
+  // Reset request counts after sending metrics
+  Object.keys(requests).forEach((endpoint) => {
+    requests[endpoint] = 0;
+  });
 
   sendMetricToGrafana('cpu_usage', getCpuUsagePercentage(), 'gauge', 'percent');
   sendMetricToGrafana('memory_usage', getMemoryUsagePercentage(), 'gauge', 'percent');
@@ -78,7 +88,8 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                                 key: "source",
                                 value: { stringValue: config.metrics.source }
                             }
-                        ]
+                        ],
+
                       },
                     ],
                   },
