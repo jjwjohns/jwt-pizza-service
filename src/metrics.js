@@ -28,8 +28,10 @@ function requestTracker(req, res, next) {
               sold++;
               revenue += item.price;
           });
-      } else {
-          failure++;
+        } 
+      if (res.statusCode >= 500) {
+        console.log('Failure:', res.statusCode);
+        failure++;
       }
     });
   }
@@ -84,8 +86,11 @@ setInterval(() => {
     successes = 0;
     failures = 0;
     sendMetricToGrafana('pizzas_sold', sold, 'sum', 'count');
+    console.log('sold:', sold);
     sendMetricToGrafana('orders_failed', failure, 'sum', 'count');
+    console.log('failure:', failure);
     sendMetricToGrafana('revenue', revenue, 'sum', 'usd');
+    console.log('revenue:', revenue);
     sold = 0;
     failure = 0;
     revenue = 0;
@@ -117,6 +122,7 @@ setInterval(() => {
 
 function sendMetricToGrafana(metricName, metricValue, type, unit) {
     const metric = {
+      
       resourceMetrics: [
         {
           scopeMetrics: [
