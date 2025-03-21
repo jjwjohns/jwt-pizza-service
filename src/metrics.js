@@ -17,17 +17,17 @@ function requestTracker(req, res, next) {
     next();
 }
 
-let successes = 0;
-let failures = 0;
+// let successes = 0;
+// let failures = 0;
 
-function authTracker(success) {
-    if (success) {
-        successes++;
-    }
-    else {
-        failures++;
-    }
-}
+// function authTracker(success) {
+//     if (success) {
+//         successes++;
+//     }
+//     else {
+//         failures++;
+//     }
+// }
 
 
 function getCpuUsagePercentage() {
@@ -199,4 +199,4 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       });
   }
   
-  module.exports = { requestTracker, authTracker };
+  module.exports = { requestTracker };
