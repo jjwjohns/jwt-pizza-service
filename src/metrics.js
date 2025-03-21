@@ -89,7 +89,7 @@ setInterval(() => {
     console.log('sold:', sold);
     sendMetricToGrafana('orders_failed', failure, 'sum', 'count');
     console.log('failure:', failure);
-    sendMetricToGrafana('revenue', revenue, 'sum', 'usd');
+    sendMetricToGrafana('revenue', revenue, 'sum', 'BTC');
     console.log('revenue:', revenue);
     sold = 0;
     failure = 0;
@@ -115,7 +115,7 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
                   [type]: {
                     dataPoints: [
                       {
-                        asInt: metricValue,
+                        ...(unit === "BTC" ? { asDouble: metricValue } : { asInt: metricValue }),
                         timeUnixNano: Date.now() * 1000000,
                         attributes: [
                             {
@@ -216,4 +216,30 @@ function sendMetricToGrafana(metricName, metricValue, type, unit) {
       });
   }
   
-  module.exports = { requestTracker, authTracker };
+  // copilot generate code for testing
+  const metrics = {
+    getRequestCount: () => {
+        return Object.values(requests).reduce((acc, methods) => {
+            return acc + Object.values(methods).reduce((sum, count) => sum + count, 0);
+        }, 0);
+    },
+    getFailedRequestCount: () => failure,
+    getActiveUsers: () => Array.from(activeUsers),
+    getAuthSuccessCount: () => successes,
+    getAuthFailureCount: () => failures,
+    reset: () => {
+        Object.keys(requests).forEach(endpoint => {
+            Object.keys(requests[endpoint]).forEach(method => {
+                requests[endpoint][method] = 0;
+            });
+        });
+        activeUsers.clear();
+        sold = 0;
+        failure = 0;
+        revenue = 0;
+        successes = 0;
+        failures = 0;
+    }
+};
+
+  module.exports = { requestTracker, authTracker, metrics };
