@@ -11,7 +11,7 @@ let latencies = [];
 let Orderlatencies = [];
 
 function requestTracker(req, res, next) {
-  if (req.path !== '/api/order' && req.method !== 'POST') {
+  if (!(req.path === '/api/order' && req.method === 'POST')) {
     const start = process.hrtime();
     res.on("finish", () => {
       const diff = process.hrtime(start);
