@@ -11,12 +11,14 @@ let latencies = [];
 let Orderlatencies = [];
 
 function requestTracker(req, res, next) {
-  const start = process.hrtime();
-  res.on("finish", () => {
-    const diff = process.hrtime(start);
-    const latencyMs = (diff[0] * 1e3) + (diff[1] / 1e6);
-    latencies.push(latencyMs);
-  });
+  if (req.path !== '/api/order' && req.method !== 'POST') {
+    const start = process.hrtime();
+    res.on("finish", () => {
+      const diff = process.hrtime(start);
+      const latencyMs = (diff[0] * 1e3) + (diff[1] / 1e6);
+      latencies.push(latencyMs);
+    });
+  }
 
   const endpoint = req.path;
   const method = req.method;
