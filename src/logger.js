@@ -1,5 +1,6 @@
 const config = require('./config');
 
+
 class Logger {
     httpLogger = (req, res, next) => {
         console.log("HTTP Logger");
