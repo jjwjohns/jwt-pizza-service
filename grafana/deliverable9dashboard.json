@@ -1,0 +1,1197 @@
+{
+    "annotations": {
+        "list": [
+        {
+            "builtIn": 1,
+            "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+        }
+        ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 14,
+    "links": [],
+    "panels": [
+        {
+        "datasource": {
+            "type": "loki",
+            "uid": "grafanacloud-logs"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "custom": {
+                "align": "auto",
+                "cellOptions": {
+                "type": "auto"
+                },
+                "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 0
+        },
+        "id": 18,
+        "options": {
+            "cellHeight": "sm",
+            "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+                "sum"
+            ],
+            "show": false
+            },
+            "showHeader": true,
+            "sortBy": [
+            {
+                "desc": true,
+                "displayName": "Time"
+            }
+            ]
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "datasource": {
+                "type": "loki",
+                "uid": "grafanacloud-logs"
+            },
+            "direction": "backward",
+            "editorMode": "builder",
+            "expr": "{service_name=\"jwt-pizza-service\"} |= `` | json",
+            "queryType": "range",
+            "refId": "A"
+            }
+        ],
+        "title": "Logs",
+        "transformations": [
+            {
+            "id": "extractFields",
+            "options": {
+                "source": "labels"
+            }
+            },
+            {
+            "id": "organize",
+            "options": {
+                "excludeByName": {},
+                "includeByName": {
+                "Time": true,
+                "authorized": true,
+                "detected_level": false,
+                "email": true,
+                "id": false,
+                "labelTypes": false,
+                "labels": false,
+                "level": true,
+                "method": true,
+                "name": true,
+                "path": true,
+                "reqBody": true,
+                "resBody": true,
+                "service_name": false,
+                "statusCode": true,
+                "tsNs": false,
+                "type": true
+                },
+                "indexByName": {
+                "Time": 0,
+                "email": 2,
+                "level": 3,
+                "name": 4,
+                "service_name": 1
+                },
+                "renameByName": {}
+            }
+            }
+        ],
+        "type": "table"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": true,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+        },
+        "id": 12,
+        "interval": "10s",
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            }
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum(rate(http_requests_total{source=\"jwt-pizza-service\"}[10m])) * 60",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "legendFormat": "Total",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum(rate(http_requests_total{source=\"jwt-pizza-service\", method=\"GET\"}[10m])) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Get",
+            "range": true,
+            "refId": "C",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum(rate(http_requests_total{source=\"jwt-pizza-service\", method=\"DELETE\"}[10m])) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Delete",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum(rate(http_requests_total{source=\"jwt-pizza-service\", method=\"POST\"}[10m])) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Post",
+            "range": true,
+            "refId": "D",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum(rate(http_requests_total{source=\"jwt-pizza-service\", method=\"PUT\"}[10m])) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Put",
+            "range": true,
+            "refId": "E",
+            "useBackend": false
+            }
+        ],
+        "title": "HTTP Requests/minute",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "{__name__=\"active_users_count\", source=\"jwt-pizza-service\"}"
+                },
+                "properties": [
+                {
+                    "id": "displayName",
+                    "value": "Active Users"
+                },
+                {
+                    "id": "custom.axisColorMode",
+                    "value": "series"
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "mode": "palette-classic-by-name"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+        },
+        "id": 8,
+        "interval": "10s",
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            }
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "active_users_count{source=\"jwt-pizza-service\"}",
+            "fullMetaSearch": false,
+            "includeNullMetadata": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            }
+        ],
+        "title": "Active Users",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 62,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "semi-dark-blue",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 16
+        },
+        "id": 17,
+        "interval": "10s",
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            }
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "latency_milliseconds{source=\"jwt-pizza-service\"}",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "legendFormat": "Service Latency (ms)",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            }
+        ],
+        "title": "Average Service Latency",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisGridShow": true,
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 57,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "mode": "continuous-BlYlRd"
+                    }
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "Pizza Ordering Latency (ms)"
+                },
+                "properties": [
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "super-light-orange",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 16
+        },
+        "id": 16,
+        "interval": "10s",
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            }
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "order_latency_milliseconds{source=\"jwt-pizza-service\"}",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "legendFormat": "Pizza Ordering Latency (ms)",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            }
+        ],
+        "title": "Average Order Latency",
+        "type": "timeseries"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 81,
+                "gradientMode": "hue",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": []
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 24
+        },
+        "id": 15,
+        "interval": "10s",
+        "options": {
+            "barRadius": 0,
+            "barWidth": 1,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "never",
+            "stacking": "normal",
+            "text": {
+            "percentSize": 1
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            },
+            "xField": "Time",
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 100
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "rate(pizzas_sold_count_total{source=\"jwt-pizza-service\"}[1m]) * 60",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "legendFormat": "Pizzas Sold/minute",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "rate(orders_failed_count_total{source=\"jwt-pizza-service\"}[1m]) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Pizza Order Failure/minute",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+            }
+        ],
+        "title": "Pizza Creation",
+        "type": "barchart"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+                },
+                "properties": [
+                {
+                    "id": "unit",
+                    "value": "currencyBTC"
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 24
+        },
+        "id": 14,
+        "interval": "10s",
+        "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "rate(revenue_BTC_total{source=\"jwt-pizza-service\"}[1m]) * 60",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "legendFormat": "BITCOIN Revenue",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            }
+        ],
+        "title": "Revenue BTC/minute",
+        "transparent": true,
+        "type": "stat"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "{__name__=\"cpu_usage_percent\", source=\"jwt-pizza-service\"}"
+                },
+                "properties": [
+                {
+                    "id": "displayName",
+                    "value": "CPU Usage %"
+                },
+                {
+                    "id": "min",
+                    "value": 0
+                },
+                {
+                    "id": "max",
+                    "value": 100
+                },
+                {
+                    "id": "thresholds",
+                    "value": {
+                    "mode": "absolute",
+                    "steps": [
+                        {
+                        "color": "green"
+                        },
+                        {
+                        "color": "#EAB839",
+                        "value": 30
+                        },
+                        {
+                        "color": "red",
+                        "value": 70
+                        }
+                    ]
+                    }
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byName",
+                "options": "{__name__=\"memory_usage_percent\", source=\"jwt-pizza-service\"}"
+                },
+                "properties": [
+                {
+                    "id": "displayName",
+                    "value": "Memory Usage %"
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "orange",
+                    "mode": "thresholds"
+                    }
+                },
+                {
+                    "id": "thresholds",
+                    "value": {
+                    "mode": "percentage",
+                    "steps": [
+                        {
+                        "color": "semi-dark-green"
+                        },
+                        {
+                        "color": "#EAB839",
+                        "value": 30
+                        },
+                        {
+                        "color": "red",
+                        "value": 70
+                        }
+                    ]
+                    }
+                },
+                {
+                    "id": "min",
+                    "value": 0
+                },
+                {
+                    "id": "max",
+                    "value": 100
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 32
+        },
+        "id": 5,
+        "interval": "10s",
+        "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+            "calcs": [
+                "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "cpu_usage_percent{source=\"jwt-pizza-service\"}",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "interval": "",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "memory_usage_percent{source=\"jwt-pizza-service\"}",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+            }
+        ],
+        "title": "System Usage",
+        "type": "gauge"
+        },
+        {
+        "datasource": {
+            "type": "prometheus",
+            "uid": "grafanacloud-prom"
+        },
+        "description": "Only tracks when the system authenticates a token. Doesn't include logging in.",
+        "fieldConfig": {
+            "defaults": {
+            "color": {
+                "mode": "palette-classic"
+            },
+            "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 23,
+                "gradientMode": "none",
+                "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                "group": "A",
+                "mode": "none"
+                },
+                "thresholdsStyle": {
+                "mode": "off"
+                }
+            },
+            "mappings": [],
+            "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                {
+                    "color": "green"
+                },
+                {
+                    "color": "red",
+                    "value": 80
+                }
+                ]
+            }
+            },
+            "overrides": [
+            {
+                "matcher": {
+                "id": "byFrameRefID",
+                "options": "A"
+                },
+                "properties": [
+                {
+                    "id": "displayName",
+                    "value": "Authentication Successes"
+                }
+                ]
+            },
+            {
+                "matcher": {
+                "id": "byFrameRefID",
+                "options": "B"
+                },
+                "properties": [
+                {
+                    "id": "displayName",
+                    "value": "Authentication Failures"
+                },
+                {
+                    "id": "color",
+                    "value": {
+                    "fixedColor": "dark-red",
+                    "mode": "fixed"
+                    }
+                }
+                ]
+            }
+            ]
+        },
+        "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 32
+        },
+        "id": 11,
+        "interval": "10",
+        "options": {
+            "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+            },
+            "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+            }
+        },
+        "pluginVersion": "11.6.0-84846",
+        "targets": [
+            {
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "exemplar": false,
+            "expr": "rate(auth_successes_count_total{source=\"jwt-pizza-service\"}[5m]) * 60",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+            },
+            {
+            "datasource": {
+                "type": "prometheus",
+                "uid": "grafanacloud-prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "rate(auth_failures_count_total{source=\"jwt-pizza-service\"}[5m]) * 60",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+            }
+        ],
+        "title": "Authentication Attempts/minute",
+        "type": "timeseries"
+        }
+    ],
+    "preload": false,
+    "refresh": "5s",
+    "schemaVersion": 41,
+    "tags": [],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-5m",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Pizza Dashboard",
+    "uid": "degft9ajmvrpcb",
+    "version": 47
+}
